@@ -1,5 +1,6 @@
 import socket
 
+from controllers.get_all_controller import Get_all
 from typing import List, Any
 from config import IP, PORT, LISTEN_NUM, BUFFER_SIZE
 
@@ -23,24 +24,13 @@ class TCP_Server():
         self.tcp_server.bind((IP, PORT))
         self.tcp_server.listen(LISTEN_NUM)
 
-    def get_all(self, buffered_args: List) -> bytes:
-        """
-        get_all
-        """
-        print("GET_ALL: " + ' '.join(buffered_args))
-        if not buffered_args:
-            response = b"502 Bad Parameter"
-        else:
-            response = b"200 OK!"
-
-        return response
-
     def process(self, cmd: CMD, buffered_args: List):
         """
         process
         """
         if cmd == CMD.GET_ALL:
-            response = self.get_all(buffered_args)
+            get_all = Get_all(buffered_args)
+            response = get_all.execute()
 
         return response
 
@@ -67,7 +57,7 @@ class TCP_Server():
 
             if wait_for_dot:
                 if data != b'.':
-                    response = b"522 Bad Request!"
+                    response = b"522 Bad Request."
                     break_flag = True
                 else:
                     wait_for_dot = False
@@ -87,7 +77,7 @@ class TCP_Server():
                     break_flag = True
 
                 else:
-                    response = b"command is invalid"
+                    response = b"Command is invalid."
 
             client.send(response + b'\n')
 
@@ -115,5 +105,6 @@ class TCP_Server():
                 break
 
 
-t = TCP_Server()
-t.run()
+if __name__ == "__main__":
+    t = TCP_Server()
+    t.run()
